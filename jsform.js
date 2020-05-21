@@ -103,7 +103,7 @@ function jsform_submit(form) {
     var r = new XMLHttpRequest();
     r.open(method, get_url());
     r.onerror = function(event) {
-        var e = new CustomEvent('jsformerror', {bubbles: true, cancelable: true});
+        var e = new CustomEvent('jsformnetworkerror', {bubbles: true, cancelable: true});
         form.dispatchEvent(e);
         if (!e.defaultPrevented) {
             alert('Failed to submit form.');

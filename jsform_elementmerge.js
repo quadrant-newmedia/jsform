@@ -34,17 +34,18 @@ addEventListener('jsformsuccess', function(event) {
 
 function recursive_node_merge(parent, old_node, new_node) {
     if (!old_node) {
-        parent.appendChild(new_node);
+        parent.appendChild(new_node.cloneNode(true));
         return
     }
     if (!new_node) {
         parent.removeChild(old_node);
         return
     }
-    if (old_node.nodeName != new_node.nodeName) {
-        old_node.replaceWith(new_node);
+    if (old_node.nodeName != new_node.nodeName || old_node.nodeType == Node.TEXT_NODE) {
+        old_node.replaceWith(new_node.cloneNode(true));
         return
     }
+
     if (!should_merge(old_node)) return
 
     // Now we have two nodes, both of same type
