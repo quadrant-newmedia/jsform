@@ -2,7 +2,7 @@
 
 A new, event driven way to handle form submissions. 
 
-Somewhat inspired by (this jquery form plugin)[http://jquery.malsup.com/form/].
+Somewhat inspired by [this jquery form plugin](http://jquery.malsup.com/form/).
 
 ## Reason
 
