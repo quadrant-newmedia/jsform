@@ -4,6 +4,10 @@ A new, event driven way to handle form submissions.
 
 Somewhat inspired by [this jquery form plugin](http://jquery.malsup.com/form/).
 
+## Project Status
+
+This project is almost completely untested. We plan to develop/test it as we find uses for it. That said, if you have any questions, suggestions or comments, feel free to [create a new issue](https://github.com/quadrant-newmedia/jsform/issues/new). 
+
 ## Reason
 
 Synchronous, full-page form submissions have the following issues:
@@ -84,6 +88,17 @@ Now the page updates "in place" when the user submits the form. Input focus, scr
 
 ### Putting Them Together
 `jsform_execresponse.js` and `jsform_elementmerge.js` go really well together. If you want to update the page in response to a form submission (ie. a successful "filter form", or a form with errors to report), just return a full html page. If the form was successful, and you want the user's browser to navigate/go back/reload/etc, return a javascript response.
+
+## Requirements/Supported Form Features
+
+We use `FormData()` to serialize data for POST requests, which requires IE 10+.
+
+All of our features _should_ work in IE 10+ or any other current browser, but we haven't tested yet.
+
+We get the browser to do as much as possible when it comes to serializing forms. All standard form features should be supported in any browser that supports said feature:
+- file uploads
+- overriding `target` or `method` on a submit button via `form*` attributes
+- using `form` attribute on an input element outside of the form element (not supported in IE)
 
 ## TODO
 - create a reusbale Django app, including static files and a simple set of "javascript responses"
