@@ -17,7 +17,7 @@ Creating a great UI requires submitting forms with AJAX. So far, no framework I'
 
 Any form with `target="jsform"` will be submitted with an XMLHTTPRequest (even if you submit it manually via `form.submit()`). We aim to recreate the request exactly as the browser would have created it otherwise. 
 
-The `action` and `method` are read from the form, and can be overridden per-submit button via `formaction` and `formmethod`. We ignore `enctype`, however - `application/x-www-form-urlencoded` is always used for GET requests, and `multipart/form-data` is used for all other methods.
+The `action` and `method` are read from the form, and can be overridden per-submit button via `formaction` and `formmethod`. We ignore `enctype`, however; `application/x-www-form-urlencoded` is always used for GET requests, and `multipart/form-data` is used for all other methods.
 
 The only opportunity you have to handle the submission is by listening to the events we dispatch. All events are dispatched on the form element, and they all bubble (so you can attach listeners directly to `window`).
 
@@ -25,10 +25,10 @@ The only opportunity you have to handle the submission is by listening to the ev
 
 This event is fired any time a form is submitted, right before the request is sent. `event.detail` will be an object with the following properties:
 
-- *method*: the request method
-- *action*: the request url (without any query string)
-- *query*: the querystring (no leading '?', null for anything but GET requests)
-- *body*: the request body (null for GET requests)
+- **method**: the request method
+- **action**: the request url (without any query string)
+- **query**: the querystring (no leading '?', null for anything but GET requests)
+- **body**: the request body (null for GET requests)
 
 This event has no default action.
 
@@ -48,7 +48,7 @@ The default action is to `alert()` a basic success/error message to the user. `p
 
 ## Duplicate Submission Blocking
 
-When a form is submitted, we add a `block-submissions` attribute to the form. Whenever this attribute is present, we will not allow further submissions. 
+When a form is submitted, we add a `block-submissions` attribute to the form. Whenever this attribute is present, we will not allow further submissions. You _may_ want to use this attribute as a selector to style the form differently, or to block user input via javascript.
 
 This attribute is set at the very beiggning of the submission process, before any of our events are fired. You may remove this attribute in any of your event listeners if you wish to allow further submissions.
 
