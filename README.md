@@ -58,13 +58,17 @@ This attribute is set at the very beiggning of the submission process, before an
 
 ## Intended Usage
 
-You _could_ manually add event listeners to each form you create. Where jsform really shines, though, is when you add global event listeners that take appropriate action, based on the response details (and possibly form attributes/data).
+You _could_ manually add event listeners to each form you create, writing custom javascript to handle each response. 
 
-### `replace-query` and `push-query`
+Where jsform really shines, though, is when you create a framework with global event listeners. Ideally, you won't be required to write any form-specific event listeners. `jsform.js` includes some built-in event listeners, and we also supply some opt-in listeners in separate scripts.
 
-We supply a built-in event listener which listens to `jsformsubmitted`. If the form has `replace-query` set as an attribute, then we `history.replaceState()` to update the querystring of the current url to match the data of the form. Likewise, if the form has `push-query`, then we `history.pushState()`.
+### `replace-query`
 
-This allows you to build "reloadable" pages. The (ajax) form request returns only the information needed to update/mutate the page. If the user reloads the page (or returns to it via browser history), your server should know how to generate the entire page.
+This built-in listener listens to `jsformsubmitted`. If the form has `replace-query` set as an attribute, then we `history.replaceState()` to update the querystring of the current url to match the data of the form.
+
+This allows you to build "reloadable" pages, which restore the form state on reload or back/forward. 
+
+Note that it's up to you to restore the form when the page is loaded with the query in the url.
 
 ### `jsform_execresponse.js`
 
@@ -78,11 +82,33 @@ Rather than hand-crafting such responses, we recommend creating a mini-framework
 
 This is really cool, if I do say so myself.
 
-If the submission response is of content-type `text/html`, then we "merge" that document with the current one. This allows you to add error/success messages, remove elements, etc. However, elements are actually kept in the DOM, so your UI state (scroll position, focus, text selection, file input values) is not lost.  
+If the submission response is of content-type `text/html`, then we mutate the current DOM as minimally as possible so that it matches the "new document" specified in that response. This allows you to add error/success messages, remove elements, etc., while leaving most elements untouched, so that your UI state (scroll position, focus, text selection, file input values) is not lost. 
 
-Imagine you're using a typical backend framework like Django, and you've got some type of "filtered list page", where a (GET) form is used to filter/paginate the results. In response to a form submission, your server recreates the entire page. Without jsform, the entire page reloads. The user's scroll position, focus, etc. are reset (and a new history entry is created). If the user updates the filter form many times, many history entries will be created.
+Note that we only merge the body of the current DOM with the body of the new document. The head is left unchanged. We also provide a few "merge directives" for controlling the merge process, which you specify via custom html attributes.
 
-Now imagine you add `target="jsform" replace-query` to the form, include `jsform_elementmerge.js` on the page, and do nothing else (the server's response to the form submission is exactly the same). 
+#### `elementmerge-nomerge`
+
+Elements with this attribute will have neither child nodes nor attributes updated to match the corresponding new element. You can add this to elements whose contents are created/mutated via javascript at page load, so that those contents won't be erased/changed by the merge.
+
+Note that an element with this attribute will still be *removed* from the DOM if there is no corrseponding element in the new document. Either this element will be untouched by the merge, or it will be removed completely.
+
+#### `elementmerge-skip`
+
+You should set this on elements which are added dynamically, which will have no corresponding element in the new document, but you still want to retain after the merge. 
+
+This is important not only to ensure that this element does not get removed, but also so that all subsequent siblings of this element are merged with the correct corresponding elements in the new document.
+
+#### TODO 
+
+Allow users to specify custom selectors to be treated as "nomerge" and "skip". Would be useful for elements which are mutated/added by third-party javascript libraries (ie. select2).
+
+#### Benefit/Sample Use Case
+
+If you're using a backend form processing framework (ie. Django) which regenerates the entire page/form on submit, you can probably make your user experience much better just by adding `jsform_elementmerge.js`.
+
+Imagine you've got some type of "filtered list page", where a (GET) form is used to filter/paginate the results. In response to a form submission, your server recreates the entire page. Without jsform, the entire page reloads. The user's scroll position, focus, etc. are reset (and a new history entry is created). If the user updates the filter form many times, many history entries will be created.
+
+Now imagine you add `target="jsform" replace-query` to the form, include `jsform_elementmerge.js` on the page, and make no other changes (the server's response to the form submission is exactly the same). 
 
 Now the page updates "in place" when the user submits the form. Input focus, scroll position, etc. are not lost. If the user updates the filter form many times, only the last set of filters is "remembered". Reloading the page (or navigating away and then coming back) will still work (the page, with filled-in form, will be regenerated by your server).
 

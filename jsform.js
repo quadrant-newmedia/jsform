@@ -162,12 +162,13 @@ HTMLFormElement.prototype.submit = function() {
 }
 
 addEventListener('jsformsubmitted', function(e) {
-    if (!e.detail.method == 'get') return
     if (e.target.hasAttribute('replace-query')) {
-        history.replaceState(history.state, '', '?'+e.detail.query);
-    }
-    else if (e.target.hasAttribute('push-query')) {
-        history.pushState(history.state, '', '?'+e.detail.query);
+        if (e.detail.method != 'get') {
+            console.warn('replace-query only works with method="GET"');
+        }
+        else {
+            history.replaceState(history.state, '', '?'+e.detail.query);
+        }
     }
 });
 
