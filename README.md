@@ -134,8 +134,9 @@ We get the browser to do as much as possible when it comes to serializing forms.
 - overriding `target` or `method` on a submit button via `form*` attributes
 - using `form` attribute on an input element outside of the form element (not supported in IE)
 
-## TODO
-- create a reusbale Django app, including static files and a simple set of "javascript responses"
-- create tests 
+## Demo/Testing
+
+This project is difficult to demo/test properly without a backend. [django_jsform](https://github.com/quadrant-newmedia/django_jsform) provides Django integration for jsform, and also serves as the official test/demo repository.
+
 
 
