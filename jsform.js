@@ -50,11 +50,22 @@ function to_querystring(form, submitting_button) {
         // submit buttons should only be submitted if clicked
         if (e.type == 'submit' && e != submitting_button) continue
         if (!e.name) continue
-        items.push(encodeURIComponent(e.name)+'='+encodeURIComponent(e.value));
+        if (e.nodeName == 'SELECT' && e.multiple) {
+            // select inputs with [multiple] need special handling
+            pushSelectedOptions(e, items);
+        } else {
+            items.push(encodeURIComponent(e.name)+'='+encodeURIComponent(e.value));
+        }
     }
     return items.join('&');
 }
-
+function pushSelectedOptions(select, items) {
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].selected) {
+            items.push(encodeURIComponent(select.name)+'='+encodeURIComponent(select.options[i].value));
+        }
+    }
+}
 
 function jsform_submit(form) {
     /*
@@ -106,12 +117,11 @@ function jsform_submit(form) {
         var e = new CustomEvent('jsformnetworkerror', {bubbles: true, cancelable: true});
         form.dispatchEvent(e);
         if (!e.defaultPrevented) {
-            alert('Failed to submit form.');
-            console.error('Failed to submit form: ', event);
+            alert('Failed to submit form: network error.');
         }
     }
     r.onload = function(event) {
-        if (200 <= r.status < 299) {
+        if (200 <= r.status && r.status < 299) {
             var e = new CustomEvent('jsformsuccess', {
                 detail: r,
                 bubbles: true,
