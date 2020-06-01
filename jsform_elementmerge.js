@@ -28,7 +28,7 @@ addEventListener('jsformsuccess', function(event) {
             You have to set responseType to 'document', but you have to set this BEFORE you make the request.
             We can't do that - we want to let the server decide what type of response to return (which may depend on the form values).
         */
-        new DOMParser().parseFromString(request.response, 'text/html').body,
+        new DOMParser().parseFromString(request.response, 'text/html').body
     );
 });
 
@@ -42,7 +42,8 @@ function recursive_node_merge(parent, old_node, new_node) {
         return
     }
     if (old_node.nodeName != new_node.nodeName || old_node.nodeType == Node.TEXT_NODE) {
-        old_node.replaceWith(new_node.cloneNode(true));
+        parent.insertBefore(new_node.cloneNode(true), old_node);
+        parent.removeChild(old_node);
         return
     }
 

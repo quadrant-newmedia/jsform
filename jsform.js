@@ -82,7 +82,8 @@ function jsform_submit(form) {
 
     var submitting_button = get_submit_button(form);
     var method = ((submitting_button && submitting_button.getAttribute('formmethod')) || form.method).toLowerCase();
-    var action = (submitting_button && submitting_button.getAttribute('formaction')) || form.action;
+    // NOTE - in IE, form.action is not handled properly, so we have to set explicit fallback of current url
+    var action = (submitting_button && submitting_button.getAttribute('formaction')) || form.action || location.href;
 
     // if GET, data needs to go in url query string
     // else, it goes in body
