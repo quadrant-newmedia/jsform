@@ -19,11 +19,17 @@ Creating a great UI requires submitting forms with AJAX. So far, no framework I'
 
 ## What it Does
 
-Any form with `target="jsform"` will be submitted with an XMLHTTPRequest (even if you submit it manually via `form.submit()`). We aim to recreate the request exactly as the browser would have created it otherwise. 
+Any form with `target="jsform"` will be submitted with an XMLHTTPRequest (even if you submit it manually via `form.submit()`), and several custom events will be dispatched on the form element.
 
-The `action` and `method` are read from the form, and can be overridden per-submit button via `formaction` and `formmethod`. We ignore `enctype`, however; `application/x-www-form-urlencoded` is always used for GET requests, and `multipart/form-data` is used for all other methods.
+We aim to recreate the request exactly as the browser would have created it for a normal form. The `action` and `method` are read from the form, and can be overridden per-submit button via `formaction` and `formmethod`. We ignore `enctype`, however; `application/x-www-form-urlencoded` is always used for GET requests, and `multipart/form-data` is used for all other methods.
 
-The only opportunity you have to handle the submission is by listening to the events we dispatch. All events are dispatched on the form element, and they all bubble (so you can attach listeners directly to `window`).
+## The Events
+
+All events are dispatched on the form element, and they all bubble (so you can attach listeners directly to `window`). 
+
+Also, you can specify inline event handlers via `on*` attributes, just like native DOM events. Like native inline handlers, the content of the attribute will be executed as a function with `event` as the sole parameter, and returning `false` will cause `event.preventDefault()` to be called.
+
+    <small>Unlike native inline event handlers, ours are implemented by a single event listener, bound to the window on the capturing phase. This means they run earlier than native inline handlers would. If you don't know what this means, then it's very unlikely to have any impact on your code.</small>
 
 ### jsformsubmitted
 
@@ -60,7 +66,7 @@ This attribute is set at the very beiggning of the submission process, before an
 
 You _could_ manually add event listeners to each form you create, writing custom javascript to handle each response. 
 
-Where jsform really shines, though, is when you create a framework with global event listeners. Ideally, you won't be required to write any form-specific event listeners. `jsform.js` includes some built-in event listeners, and we also supply some opt-in listeners in separate scripts.
+Where jsform really shines, though, is when you create a framework with global event listeners, for handling common patterns. `jsform.js` includes one built-in event listener, and we also supply some opt-in listeners in separate scripts.
 
 ### `replace-query`
 
@@ -68,7 +74,9 @@ This built-in listener listens to `jsformsubmitted`. If the form has `replace-qu
 
 This allows you to build "reloadable" pages, which restore the form state on reload or back/forward. 
 
-Note that it's up to you to restore the form when the page is loaded with the query in the url.
+Note - it's up to you to restore the form when the page is loaded with the query in the url.
+
+Note - only works with GET submissions. 
 
 ### `jsform_execresponse.js`
 

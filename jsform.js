@@ -147,6 +147,9 @@ function jsform_submit(form) {
     r.send(get_body());
 }
 
+/*
+    Handle all user submissions of [target=jsform]
+*/
 addEventListener('submit', function(e) {
     if (e.defaultPrevented) return
     if (e.target.target == 'jsform') {
@@ -155,12 +158,40 @@ addEventListener('submit', function(e) {
     }
 });
 
+/*
+    Patch .submit() so that programmatic submissions still use jsform
+*/
 var _submit = HTMLFormElement.prototype.submit;
 HTMLFormElement.prototype.submit = function() {
     if (this.target == 'jsform') jsform_submit(this)
     else _submit.call(this)
 }
 
+/*
+    Allow users to specify inline event handlers via on* attributes on the form
+*/
+function createInlineHandler(event_name) {
+    addEventListener(event_name, function(e) {
+        var handler = e.target.getAttribute('on'+event_name);
+        if (!handler) return
+        // convert the handler (string) to an actual function
+        handler = new Function('event', handler);
+        // call the handler, preventDefault() if it returns false, just like with other inline handlers
+        if (handler(e) === false) {
+            e.preventDefault();
+        }
+    // Notice - we listen on capturing phase. 
+    // This means this works even for events that don't bubble, and the in-line handler will generally run before any other event listeners
+    }, true);
+}
+createInlineHandler('jsformsubmitted');
+createInlineHandler('jsformnetworkerror');
+createInlineHandler('jsformerror');
+createInlineHandler('jsformsuccess');
+
+/*
+    [replace-query] listener
+*/
 addEventListener('jsformsubmitted', function(e) {
     if (e.target.hasAttribute('replace-query')) {
         if (e.detail.method != 'get') {
