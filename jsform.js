@@ -1,11 +1,13 @@
-// Polyfill CustomEvent constructor, courtesy of MDN
-// https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
+// Polyfill CustomEvent constructor, courtesy of MDN (MODIFIED - added preventDefault support)
 (function () {
   if ( typeof window.CustomEvent === "function" ) return false;
   function CustomEvent ( event, params ) {
     params = params || { bubbles: false, cancelable: false, detail: null };
     var evt = document.createEvent( 'CustomEvent' );
     evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    evt.preventDefault = function() {
+        Object.defineProperty(this, "defaultPrevented", {get: function () {return true;}});
+    }
     return evt;
    }
   window.CustomEvent = CustomEvent;
