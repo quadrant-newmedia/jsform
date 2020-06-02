@@ -1,4 +1,7 @@
-addEventListener('jsformsuccess', function(e) {
+(function() {
+'use strict';
+
+function handle_response(e) {
     var request = e.detail;
     // only handle text/javascript or application/javascript responses
     if (!/^(text|application)\/javascript/.test(request.getResponseHeader('content-type'))) return
@@ -19,4 +22,9 @@ addEventListener('jsformsuccess', function(e) {
     if (allow_further_submissions) {
         form.removeAttribute('block-submissions');
     }
-});
+}
+
+addEventListener('jsformsuccess', handle_response);
+addEventListener('jsformerror', handle_response);
+
+})();

@@ -80,7 +80,7 @@ Note - only works with GET submissions.
 
 ### `jsform_execresponse.js`
 
-This script adds an event listener which listens to `jsformsuccess` events. If the response has a content-type of `text/javascript`, then the content of the response is executed as javascript code (it's slightly more complicated than that - read the source to see the details).
+This script adds an event listener which listens to `jsformsuccess` and `jsformerror` events. If the response has a content-type of `text/javascript`, then the content of the response is executed as javascript code (it's slightly more complicated than that - read the source to see the details).
 
 This is a really handy way for the server to return simple instructions to the page (ie. `history.back()`, `location.reload()`, or `location = "some_newly_created_object/"`).
 
