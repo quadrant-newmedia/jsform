@@ -180,7 +180,7 @@ function createInlineHandler(event_name) {
         // convert the handler (string) to an actual function
         handler = new Function('event', handler);
         // call the handler, preventDefault() if it returns false, just like with other inline handlers
-        if (handler(e) === false) {
+        if (handler.call(e.target, e) === false) {
             e.preventDefault();
         }
     // Notice - we listen on capturing phase. 
