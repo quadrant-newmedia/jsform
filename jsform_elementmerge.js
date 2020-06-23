@@ -20,16 +20,15 @@ addEventListener('jsformsuccess', function(event) {
     if (!/^text\/html/.test(request.getResponseHeader('content-type'))) return
     event.preventDefault();
 
-    recursive_node_merge(
-        document.documentElement,
-        document.body,
-        /*
-            Note - XMLHTTPRequest has a built-in means of parsing response to a document.
-            You have to set responseType to 'document', but you have to set this BEFORE you make the request.
-            We can't do that - we want to let the server decide what type of response to return (which may depend on the form values).
-        */
-        new DOMParser().parseFromString(request.response, 'text/html').body
-    );
+    /*
+        Note - XMLHTTPRequest has a built-in means of parsing response to a document.
+        You have to set responseType to 'document', but you have to set this BEFORE you make the request.
+        We can't do that - we want to let the server decide what type of response to return (which may depend on the form values).
+    */
+    var new_doc = new DOMParser().parseFromString(request.response, 'text/html');
+    
+    recursive_node_merge(document.documentElement, document.head, new_doc.head);
+    recursive_node_merge(document.documentElement, document.body, new_doc.body);
 });
 
 function recursive_node_merge(parent, old_node, new_node) {

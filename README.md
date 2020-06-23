@@ -92,7 +92,9 @@ This is really cool, if I do say so myself.
 
 If the submission response is of content-type `text/html`, then we mutate the current DOM as minimally as possible so that it matches the "new document" specified in that response. This allows you to add error/success messages, remove elements, etc., while leaving most elements untouched, so that your UI state (scroll position, focus, text selection, file input values) is not lost. 
 
-Note that we only merge the body of the current DOM with the body of the new document. The head is left unchanged. We also provide a few "merge directives" for controlling the merge process, which you specify via custom html attributes.
+Note that while we merge the entire document, including the `head`, dynamically updating the `src` of a `script` or the `href` of a `link` will have no effect (but adding a new `script` or `link` will cause that resource to be downloaded/used).
+
+We also provide a few "merge directives" for controlling the merge process, which you specify via custom html attributes. See the source code for details.
 
 #### `elementmerge-nomerge`
 
