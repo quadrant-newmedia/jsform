@@ -81,7 +81,7 @@ function merge_from(url) {
 window.elementmerge = {
     merge_from: merge_from,
     reload: function() {
-        merge_from('.');
+        merge_from(location.href);
     },
 }
 
