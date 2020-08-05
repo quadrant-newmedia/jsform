@@ -1,3 +1,10 @@
+/*
+    Note/TODO:
+    This file was initially intended only for use with jsform.
+    We now expose some useful global utility functions.
+    It would probably be better to move this to an external library, and add it as a dependency.
+*/
+
 (function() {
 'use strict';
 
@@ -14,22 +21,79 @@ if (Element.prototype.getAttributeNames == undefined) {
   };
 }
 
+function merge_documents(old_doc, new_doc) {
+    /*
+        First try finding and merging any [elementmerge-whitelist] elements
+        This attribute should be specified in NEW document, and element must have an id (matching id of an element in old document)
+    */
+    if (merge_whitelist(old_doc, new_doc)) {
+        return
+    }
+
+    /*
+        If no whitelist, merge entire body
+    */
+    recursive_node_merge(
+        old_doc.documentElement,
+        old_doc.body,
+        new_doc.body,
+    );
+}
+function merge_whitelist(old_doc, new_doc) {
+    var whitelist = new_doc.querySelectorAll('[elementmerge-whitelist]');
+    if (!whitelist.length) {
+        return false
+    }
+    for (var i = whitelist.length - 1; i >= 0; i--) {
+        try {
+            var old_element = old_doc.getElementById(whitelist[i].id);
+            var parent = old_element.parentElement;
+        }
+        catch(e) {
+            console.error('Unable to find element in old document corresponding to: ',  whitelist[i], '. It either has no id, or no corresponding element in the old document.');
+            continue
+        }
+        recursive_node_merge(parent, old_element, whitelist[i]);
+    }
+    return true
+}
+function merge_from(url) {
+    var r = new XMLHttpRequest();
+    r.addEventListener('load', function(event) {
+        if (r.status < 200 || r.status > 299) {
+            return
+        }
+        merge_documents(document, r.response);
+    });
+    r.open('GET', url);
+    r.responseType = 'document';
+    r.send();
+}
+
+/*
+    Expose some useful utility functions
+*/
+window.elementmerge = {
+    merge_from: merge_from,
+    reload: function() {
+        merge_from('.');
+    },
+}
+
+
 addEventListener('jsformsuccess', function(event) {
     var request = event.detail;
+
     // only handle text/html responses
     if (!/^text\/html/.test(request.getResponseHeader('content-type'))) return
-    event.preventDefault();
 
-    recursive_node_merge(
-        document.documentElement,
-        document.body,
-        /*
-            Note - XMLHTTPRequest has a built-in means of parsing response to a document.
-            You have to set responseType to 'document', but you have to set this BEFORE you make the request.
-            We can't do that - we want to let the server decide what type of response to return (which may depend on the form values).
-        */
-        new DOMParser().parseFromString(request.response, 'text/html').body
-    );
+    event.preventDefault();
+    /*
+        Note - XMLHTTPRequest has a built-in means of parsing response to a document.
+        You have to set responseType to 'document', but you have to set this BEFORE you make the request.
+        We can't do that - we want to let the server decide what type of response to return (which may depend on the form values).
+    */
+    merge_documents(document, new DOMParser().parseFromString(request.response, 'text/html'));
 });
 
 function recursive_node_merge(parent, old_node, new_node) {
