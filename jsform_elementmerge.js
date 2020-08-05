@@ -31,8 +31,13 @@ function merge_documents(old_doc, new_doc) {
     }
 
     /*
-        If no whitelist, merge entire body
+        If no whitelist, merge head and body
     */
+    recursive_node_merge(
+        old_doc.documentElement,
+        old_doc.head,
+        new_doc.head,
+    );
     recursive_node_merge(
         old_doc.documentElement,
         old_doc.body,
