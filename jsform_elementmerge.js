@@ -121,17 +121,22 @@ function recursive_node_merge(parent, old_node, new_node) {
     // Now we have two nodes, both of same type
 
     // merge the children
-    var i = 0, j = 0;
-    // Note - old_node.childNodes.length may change (shrink) during this loop, so we really do have to recalculate each iteraction
-    while (i < old_node.childNodes.length || j < new_node.childNodes.length) {
-        if (should_skip(old_node.childNodes[i])) {
-            i++;
-            continue
+    var old_child = old_node.childNodes[0], new_child = new_node.childNodes[0];
+    var next_old;
+    while (old_child || new_child) {
+        if (should_skip(old_child)) {
+            old_child = old_child.nextSibling;
+            continue;
         }
-        recursive_node_merge(old_node, old_node.childNodes[i], new_node.childNodes[j]);
-        i++;
-        j++;
+
+        // old_child might get deleted, so store reference to next
+        next_old = old_child && old_child.nextSibling;
+        recursive_node_merge(old_node, old_child, new_child);
+        old_child = next_old;
+        new_child = new_child && new_child.nextSibling;
     }
+
+
 
     // merge the attributes
     if (!old_node.hasAttribute) return // This is not an element (ie. a text node)
@@ -144,7 +149,7 @@ function recursive_node_merge(parent, old_node, new_node) {
     var new_names = new_node.getAttributeNames();
     var new_name_map = {};
     var old_names = old_node.getAttributeNames();
-    var name, value;
+    var i, name, value;
     for (i = 0; i < new_names.length; i++) {
         name = new_names[i];
         value = new_node.getAttribute(name);
