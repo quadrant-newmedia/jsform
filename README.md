@@ -52,7 +52,9 @@ Fired when the XMLHTTPRequest fails (an actual network error, _not_ an invalid H
 
 If the XMLHTTPRequest succeeds, exactly one of these will be fired. `jsformsuccess` will be fired if the response status is 2XX, `jsformerror` will fired otherwise.
 
-`event.detail` will be set to the XMLHTTPRequest object, allowing you to read the response, response headers, etc.
+`event.detail` will be set to the XMLHTTPRequest object, allowing you to read the response, response headers, etc. 
+
+We add one extra property to this XMLHTTPRequest object: `event.detail.jsform_data` will be an object with the same properties as `event.detail` in the `jsformsubmitted` event.
 
 The default action is to `alert()` a basic success/error message to the user. `preventDefault()` to cancel.
 
