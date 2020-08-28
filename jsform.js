@@ -42,6 +42,12 @@ function get_submit_button(form) {
 */
 function to_querystring(form, submitting_button) {
     var items = [];
+
+    // TODO - Document limitation? Find work around?
+    if (typeof form.elements.length === 'undefined') {
+        throw new Error('Cannot serialize the form. It looks like this form has a control named "elements". That masks the "elements" property on the form, which need in order to serialize the form.');
+    }
+
     for (var i = form.elements.length - 1; i >= 0; i--) {
         var e = form.elements[i];
         if ((e.type == 'radio' || e.type == 'checkbox') && !e.checked) continue
@@ -80,10 +86,20 @@ function jsform_submit(form) {
     if (form.hasAttribute('block-submissions')) return
     form.setAttribute('block-submissions', '')
 
+    /*
+        Form elements (inputs) can mask standard form properties,
+        so we cannot safely access form.action, form.method, etc.
+        
+        Also, the js properties are more convenient that html attributes, since they do things like resolve the action url for us.
+
+        Since this clone has no input children, we can safely access properties on it.
+    */
+    var form_clone = form.cloneNode(false);
+
     var submitting_button = get_submit_button(form);
-    var method = ((submitting_button && submitting_button.getAttribute('formmethod')) || form.method).toLowerCase();
-    // NOTE - in IE, form.action is not handled properly, so we have to set explicit fallback of current url
-    var action = (submitting_button && submitting_button.getAttribute('formaction')) || form.action || location.href;
+    var method = ((submitting_button && submitting_button.getAttribute('formmethod')) || form_clone.method).toLowerCase();
+    // NOTE - in IE, form_clone.action is not handled properly (when attribute is empty), so we have to set explicit fallback of current url
+    var action = (submitting_button && submitting_button.getAttribute('formaction')) || form_clone.action || location.href;
 
     // if GET, data needs to go in url query string
     // else, it goes in body
@@ -112,14 +128,14 @@ function jsform_submit(form) {
         action: action,
         query: method == 'get' ? to_querystring(form, submitting_button) : null,
         body: get_body(),
-    };
-    form.dispatchEvent(new CustomEvent('jsformsubmitted', {bubbles: true, detail: jsform_data}));
+    }
+    form_clone.dispatchEvent.call(form, (new CustomEvent('jsformsubmitted', {bubbles: true, detail: jsform_data})));
 
     var r = new XMLHttpRequest();
     r.open(method, get_url());
     r.onerror = function(event) {
         var e = new CustomEvent('jsformnetworkerror', {bubbles: true, cancelable: true});
-        form.dispatchEvent(e);
+        form_clone.dispatchEvent.call(form, (e));
         if (!e.defaultPrevented) {
             alert('Failed to submit form: network error.');
         }
@@ -137,7 +153,7 @@ function jsform_submit(form) {
                 bubbles: true,
                 cancelable: true,
             });
-            form.dispatchEvent(e);
+            form_clone.dispatchEvent.call(form, (e));
             if (!e.defaultPrevented) {
                 alert('Submission complete: '+r.status+' '+r.statusText);
             }
@@ -148,7 +164,7 @@ function jsform_submit(form) {
                 bubbles: true,
                 cancelable: true,
             });
-            form.dispatchEvent(e);
+            form_clone.dispatchEvent.call(form, (e));
             if (!e.defaultPrevented) {
                 alert('Submission error: '+r.status+' '+r.statusText);
             }
@@ -162,7 +178,7 @@ function jsform_submit(form) {
 */
 addEventListener('submit', function(e) {
     if (e.defaultPrevented) return
-    if (e.target.target == 'jsform') {
+    if (e.target.getAttribute('target') == 'jsform') {
         e.preventDefault();
         jsform_submit(e.target);
     }
@@ -173,7 +189,7 @@ addEventListener('submit', function(e) {
 */
 var _submit = HTMLFormElement.prototype.submit;
 HTMLFormElement.prototype.submit = function() {
-    if (this.target == 'jsform') jsform_submit(this)
+    if (this.getAttribute('target') == 'jsform') jsform_submit(this)
     else _submit.call(this)
 }
 
