@@ -3,6 +3,9 @@
     This file was initially intended only for use with jsform.
     We now expose some useful global utility functions.
     It would probably be better to move this to an external library, and add it as a dependency.
+
+    TODO: support "relocating" elements with id
+    - similar to "key" concept in react, but it's global
 */
 
 (function() {
@@ -154,7 +157,16 @@ function recursive_node_merge(parent, old_node, new_node) {
         name = new_names[i];
         value = new_node.getAttribute(name);
         new_name_map[name] = value;
-        old_node.setAttribute(name, value);
+
+        /*
+            This check seems unnecessary, but it's not.
+            Sometimes setAttribute has side effects, even if the value doesn't change.
+            Ie. when "re-setting" the href attrubute of <link>, stylesheet seems to be removed then reapplied (which causes style to change/flash).
+            I haven't been able to reproduce that behaviour outside of this script, but it was happening consistently during elementmerge.reload() before I had this check.
+        */
+        if (old_node.getAttribute(name) != value) {
+            old_node.setAttribute(name, value);
+        }
     }
     for (i = 0; i < old_names.length; i++) {
         name = old_names[i];
