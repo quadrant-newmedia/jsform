@@ -123,12 +123,13 @@ function jsform_submit(form) {
         return d;
     }
 
-    form_clone.dispatchEvent.call(form, (new CustomEvent('jsformsubmitted', {bubbles: true, detail: {
+    var jsform_data = {
         method: method,
         action: action,
         query: method == 'get' ? to_querystring(form, submitting_button) : null,
         body: get_body(),
-    }})));
+    }
+    form_clone.dispatchEvent.call(form, (new CustomEvent('jsformsubmitted', {bubbles: true, detail: jsform_data})));
 
     var r = new XMLHttpRequest();
     r.open(method, get_url());
@@ -140,6 +141,12 @@ function jsform_submit(form) {
         }
     }
     r.onload = function(event) {
+        /*
+            Initially, we thought r contained everything needed for event listeners.
+            However, there is no way to get request method from it.
+            Rather than change event.detail in a backward in-compatible way, we attach extra data to r.
+        */
+        r.jsform_data = jsform_data;
         if (200 <= r.status && r.status < 299) {
             var e = new CustomEvent('jsformsuccess', {
                 detail: r,
