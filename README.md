@@ -112,9 +112,9 @@ This is important not only to ensure that this element does not get removed, but
 
 If you set this attribute on one or more elements in the new document, then only those elements will be merged. You must set the id attribute on the element (in both old and new documents).
 
-#### TODO 
-
-Allow users to specify custom selectors to be treated as "nomerge" and "skip". Would be useful for elements which are mutated/added by third-party javascript libraries (ie. select2).
+### TODO - jsform_elementmerge
+- split into separate library
+- document `elementmerge.reload()`, `elementmerge.merge_from()`, and the options you can pass to each
 
 #### Benefit/Sample Use Case
 
