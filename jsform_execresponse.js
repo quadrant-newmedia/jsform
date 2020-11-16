@@ -12,13 +12,13 @@ function handle_response(e) {
 
     // basically, we're "eval"-ing the response
     // This is more efficient and secure, though
-    // Execute the response code as if it's the body of a function which can only access global scope, and the form element via a local "form" parameter.
-    var f = new Function('form', request.responseText);
+    // Execute the response code as if it's the body of a function which can only access global scope, and the specified parameters ('form' and 'submitting_button')
+    var f = new Function('form', 'submitting_button', request.responseText);
 
     // Note - returned function can return true to allow further form submissions
     // If the return code navigates the browser (which is asynchronous), you probably DO NOT want to do this.
     // You should return true, however, if you're just displaying some message and then letting the user submit again.
-    var allow_further_submissions = Boolean(f(form));
+    var allow_further_submissions = Boolean(f(form, request.jsform_data.submitting_button));
     if (allow_further_submissions) {
         form.removeAttribute('block-submissions');
     }

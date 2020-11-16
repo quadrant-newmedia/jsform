@@ -39,6 +39,7 @@ This event is fired any time a form is submitted, right before the request is se
 - **action**: the request url (without any query string)
 - **query**: the querystring (no leading '?', null for anything but GET requests)
 - **body**: the request body (null for GET requests)
+- **submitting_button**: the button the user clicked to submit the form, or `null`
 
 This event has no default action.
 
@@ -82,7 +83,7 @@ Note - only works with GET submissions.
 
 ### `jsform_execresponse.js`
 
-This script adds an event listener which listens to `jsformsuccess` and `jsformerror` events. If the response has a content-type of `text/javascript`, then the content of the response is executed as javascript code (it's slightly more complicated than that - read the source to see the details).
+This script adds an event listener which listens to `jsformsuccess` and `jsformerror` events. If the response has a content-type of `text/javascript`, then the content of the response is executed as a javascript function, with parameters 'form' and 'submitting_button'.
 
 This is a really handy way for the server to return simple instructions to the page (ie. `history.back()`, `location.reload()`, or `location = "some_newly_created_object/"`).
 

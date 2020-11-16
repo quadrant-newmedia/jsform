@@ -128,6 +128,7 @@ function jsform_submit(form) {
         action: action,
         query: method == 'get' ? to_querystring(form, submitting_button) : null,
         body: get_body(),
+        submitting_button: submitting_button,
     }
     form_clone.dispatchEvent.call(form, (new CustomEvent('jsformsubmitted', {bubbles: true, detail: jsform_data})));
 
