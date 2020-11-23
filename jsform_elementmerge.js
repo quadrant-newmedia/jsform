@@ -47,14 +47,16 @@ function merge_documents(old_doc, new_doc, options) {
         old_doc.documentElement,
         old_doc.head,
         new_doc.head,
-        options,
+        options
     );
     recursive_node_merge(
         old_doc.documentElement,
         old_doc.body,
         new_doc.body,
-        options,
+        options
     );
+
+    old_doc.dispatchEvent(createEvent('elementmergecomplete', false, false, null));
 }
 function merge_whitelist(old_doc, new_doc, options) {
     var whitelist = new_doc.querySelectorAll(options.whitelist);
@@ -223,6 +225,13 @@ function with_defaults(options) {
         skip: get_option_selector(options, 'skip'),
         nomerge: get_option_selector(options, 'nomerge'),
     }
+}
+
+function createEvent(name, bubbles, cancelable, detail) {
+    if ( typeof window.CustomEvent === "function" ) return new CustomEvent(name, {bubbles: bubbles, cancelable: cancelable, detail: detail});
+    var event = document.createEvent('CustomEvent');
+    event.initCustomEvent(event, bubbles, cancelable, detail);
+    return event;
 }
 
 })();

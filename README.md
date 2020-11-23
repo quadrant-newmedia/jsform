@@ -97,6 +97,8 @@ If the submission response is of content-type `text/html`, then we mutate the cu
 
 Note that while we merge the entire document, including the `head`, dynamically updating the `src` of a `script` or the `href` of a `link` will have no effect (but adding a new `script` or `link` will cause that resource to be downloaded/used).
 
+After merging is complete, we fire an `elementmergecomplete` event on the document. If you're using js-created widgets (ie. select2), you may need to re-initialize them when this event is fired.
+
 We also provide a few "merge directives" for controlling the merge process, which you specify via custom html attributes. See the source code for details.
 
 #### `elementmerge-nomerge`
