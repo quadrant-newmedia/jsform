@@ -113,6 +113,10 @@ You should set this on elements which are added dynamically, which will have no 
 
 This is important not only to ensure that this element does not get removed, but also so that all subsequent siblings of this element are merged with the correct corresponding elements in the new document.
 
+#### `elementmerge-replace`
+
+If an element in the current DOM has this attribute set, it will be replaced by the corresponding element from the new DOM (without merging any children). All client-side state will be wiped out. Useful when you want the server to update something which is normally front-end state (ie. the value of an input).
+
 #### `elementmerge-whitelist`
 
 If you set this attribute on one or more elements in the new document, then only those elements will be merged. You must set the id attribute on the element (in both old and new documents).
@@ -120,6 +124,7 @@ If you set this attribute on one or more elements in the new document, then only
 ### TODO - jsform_elementmerge
 - split into separate library
 - document `elementmerge.reload()`, `elementmerge.merge_from()`, and the options you can pass to each
+- document `elementmergecomplete` event
 
 #### Benefit/Sample Use Case
 

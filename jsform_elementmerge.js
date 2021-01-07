@@ -132,7 +132,7 @@ function recursive_node_merge(parent, old_node, new_node, options) {
         parent.removeChild(old_node);
         return
     }
-    if (old_node.nodeName != new_node.nodeName || old_node.nodeType == Node.TEXT_NODE) {
+    if (old_node.nodeName != new_node.nodeName || old_node.nodeType == Node.TEXT_NODE || should_replace(old_node, options)) {
         parent.insertBefore(new_node.cloneNode(true), old_node);
         parent.removeChild(old_node);
         return
@@ -209,6 +209,9 @@ function should_skip(old_node, options
     */
     return old_node && old_node.matches && old_node.matches(options.skip);
 }
+function should_replace(old_node, options) {
+    return old_node && old_node.matches && old_node.matches(options.replace);
+}
 
 function get_option_selector(options, option_name) {
     var fixed_value = '[elementmerge-'+option_name+']';
@@ -224,6 +227,7 @@ function with_defaults(options) {
         whitelist: get_option_selector(options, 'whitelist'),
         skip: get_option_selector(options, 'skip'),
         nomerge: get_option_selector(options, 'nomerge'),
+        replace: get_option_selector(options, 'replace'),
     }
 }
 
