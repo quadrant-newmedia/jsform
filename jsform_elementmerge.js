@@ -94,6 +94,7 @@ function merge_from(url, options) {
 */
 window.elementmerge = {
     default_options: {
+        ignoreattrs: {},
         whitelist: '',
         skip: '',
         nomerge: '',
@@ -122,7 +123,9 @@ addEventListener('jsformsuccess', function(event) {
     */
     merge_documents(document, new DOMParser().parseFromString(request.response, 'text/html'), options);
 });
-
+function should_merge_attr(element, name, options) {
+    return !(options.ignoreattrs[name] && element.matches(options.ignoreattrs[name]))
+}
 function recursive_node_merge(parent, old_node, new_node, options) {
     if (!old_node) {
         parent.appendChild(new_node.cloneNode(true));
@@ -173,6 +176,11 @@ function recursive_node_merge(parent, old_node, new_node, options) {
     var i, name, value;
     for (i = 0; i < new_names.length; i++) {
         name = new_names[i];
+
+        if (!should_merge_attr(old_node, name, options)) {
+            continue
+        }
+
         value = new_node.getAttribute(name);
         new_name_map[name] = value;
 
@@ -188,6 +196,11 @@ function recursive_node_merge(parent, old_node, new_node, options) {
     }
     for (i = 0; i < old_names.length; i++) {
         name = old_names[i];
+
+        if (!should_merge_attr(old_node, name, options)) {
+            continue
+        }
+        
         if (!new_name_map.hasOwnProperty(name)) {
             old_node.removeAttribute(name);
         }
@@ -224,6 +237,7 @@ function get_option_selector(options, option_name) {
 function with_defaults(options) {
     options = options || {};
     return {
+        ignoreattrs: 'ignoreattrs' in options ? options.ignoreattrs : elementmerge.default_options.ignoreattrs,
         whitelist: get_option_selector(options, 'whitelist'),
         skip: get_option_selector(options, 'skip'),
         nomerge: get_option_selector(options, 'nomerge'),
