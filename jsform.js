@@ -107,7 +107,8 @@ function jsform_submit(form) {
         if (method != 'get') return action
         // Now we need to serialize form
         // Ideally, we'd use FormData just like get_body, and pass to URLSearchParams to serialize, but that's not supported in IE, so we have to serialize ourselves
-        return action.split('?')[0] + '?' + to_querystring(form, submitting_button);
+        // Note - be sure to trim off any existing querystring or hash from the action
+        return action.split(/[#?]/)[0] + '?' + to_querystring(form, submitting_button);
     }
     function get_body() {
         if (method == 'get') return null
