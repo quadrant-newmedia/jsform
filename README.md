@@ -65,6 +65,10 @@ When a form is submitted, we add a `block-submissions` attribute to the form. Wh
 
 This attribute is set at the very beiggning of the submission process, before any of our events are fired. You may remove this attribute in any of your event listeners if you wish to allow further submissions.
 
+Our default `jsformsuccess` and `jsformerror` actions unblock the form (remove the `block-submissions` attribute). If you want the form to remain blocked after these events, be sure to handle the events and `preventDefault()`. 
+
+Note that we do _not_ unblock the form in the default `jsformnetworkerror` action. In such a case, your server _may_ have already handled the request, but the server's response got lost (and allowing another submission could result in duplicate data creation on your server). Also, once a network error has occurred, repeated submission attempts are unlikely to work, anyway.
+
 ## Intended Usage
 
 You _could_ manually add event listeners to each form you create, writing custom javascript to handle each response. 

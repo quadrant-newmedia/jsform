@@ -75,6 +75,10 @@ function pushSelectedOptions(select, items) {
     }
 }
 
+function unblock(form) {
+    form.removeAttribute('block-submissions');
+}
+
 function jsform_submit(form) {
     /*
         By default, we don't allow duplicate form submissions.
@@ -140,6 +144,8 @@ function jsform_submit(form) {
         form_clone.dispatchEvent.call(form, (e));
         if (!e.defaultPrevented) {
             alert('Failed to submit form: network error.');
+            // Note - do NOT unblock form on a network error
+            // The submission _might_ still be processed by server, and we don't want to submit twice
         }
     }
     r.onload = function(event) {
@@ -158,6 +164,7 @@ function jsform_submit(form) {
             form_clone.dispatchEvent.call(form, (e));
             if (!e.defaultPrevented) {
                 alert('Submission complete: '+r.status+' '+r.statusText);
+                unblock(form);
             }
         }
         else {
@@ -169,6 +176,7 @@ function jsform_submit(form) {
             form_clone.dispatchEvent.call(form, (e));
             if (!e.defaultPrevented) {
                 alert('Submission error: '+r.status+' '+r.statusText);
+                unblock(form);
             }
         }
     }
