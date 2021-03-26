@@ -47,7 +47,7 @@ Most use cases will not require listening to this event.
 
 ### jsformnetworkerror
 
-Fired when the XMLHTTPRequest fails (an actual network error, _not_ an invalid HTTP status in the response). The default action is to `alert()` a basic message to the user. `preventDefault()` to prevent the action and provide your own means of feedback.
+Fired when the XMLHTTPRequest fails (an actual network error, _not_ an invalid HTTP status in the response). The default action is to `alert()` a basic message to the user (and to "unblock" the form if it's a GET request - see "Duplicate Submission Blocking" below). Call `event.preventDefault()` to prevent this action and provide your own means of feedback.
 
 ### jsformsuccess/jsformerror
 
@@ -57,7 +57,7 @@ If the XMLHTTPRequest succeeds, exactly one of these will be fired. `jsformsucce
 
 We add one extra property to this XMLHTTPRequest object: `event.detail.jsform_data` will be an object with the same properties as `event.detail` in the `jsformsubmitted` event.
 
-The default action is to `alert()` a basic success/error message to the user. `preventDefault()` to cancel.
+The default action is to `alert()` a basic success/error message to the user (and, sometimes, to "unblock" the form - see "Duplicate Submission Blocking" below). Call `event.preventDefault()` to cancel.
 
 ## Duplicate Submission Blocking
 
@@ -65,9 +65,7 @@ When a form is submitted, we add a `block-submissions` attribute to the form. Wh
 
 This attribute is set at the very beiggning of the submission process, before any of our events are fired. You may remove this attribute in any of your event listeners if you wish to allow further submissions.
 
-Our default `jsformsuccess` and `jsformerror` actions unblock the form (remove the `block-submissions` attribute). If you want the form to remain blocked after these events, be sure to handle the events and `preventDefault()`. 
-
-Note that we do _not_ unblock the form in the default `jsformnetworkerror` action. In such a case, your server _may_ have already handled the request, but the server's response got lost (and allowing another submission could result in duplicate data creation on your server). Also, once a network error has occurred, repeated submission attempts are unlikely to work, anyway.
+Our default `jsformsuccess` and `jsformnetworkerror` actions will unblock the form _if and only if_ the submission method is GET. Our default `jsformerror` action will always unblock the form. In this case, we're assuming your server has not processed the data, and it's safe to retry submitting (this is especially helpful during development). If you want different handling of any of these events, be sure to handle them and call `event.preventDefault()`.
 
 ## Intended Usage
 

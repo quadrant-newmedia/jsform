@@ -144,8 +144,9 @@ function jsform_submit(form) {
         form_clone.dispatchEvent.call(form, (e));
         if (!e.defaultPrevented) {
             alert('Failed to submit form: network error.');
-            // Note - do NOT unblock form on a network error
-            // The submission _might_ still be processed by server, and we don't want to submit twice
+            // Unblock the form, IFF it's a get request
+            // We assume POST may alter data on server, and user must explicitly unblock the form if they want to allow further submissions
+            if (method == 'get') unblock(form);
         }
     }
     r.onload = function(event) {
@@ -164,7 +165,9 @@ function jsform_submit(form) {
             form_clone.dispatchEvent.call(form, (e));
             if (!e.defaultPrevented) {
                 alert('Submission complete: '+r.status+' '+r.statusText);
-                unblock(form);
+                // Unblock the form, IFF it's a get request
+                // We assume POST may alter data on server, and user must explicitly unblock the form if they want to allow further submissions
+                if (method == 'get') unblock(form);
             }
         }
         else {
