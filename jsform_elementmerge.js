@@ -143,8 +143,22 @@ function recursive_node_merge(parent, old_node, new_node, options) {
     if (!should_merge(old_node, options)) return
 
     // Now we have two nodes, both of same type
+    merge_children(old_node, new_node, options);
+    merge_attributes(old_node, new_node, options);
 
-    // merge the children
+}
+function merge_children(old_node, new_node, options) {
+    /*
+        This is only needed for IE.
+        AFAIK, <textarea>'s innerHTML isn't supposed to update with its value. 
+        The innerHTML is just for setting defaultValue.
+        However, in IE, it actually updates as the user types, and chaning it will always change the value.
+        So for <textarea>, we never update child nodes.
+    */
+    if (old_node.nodeName == 'TEXTAREA') {
+        return
+    }
+
     var old_child = old_node.childNodes[0], new_child = new_node.childNodes[0];
     var next_old;
     while (old_child || new_child) {
@@ -159,10 +173,8 @@ function recursive_node_merge(parent, old_node, new_node, options) {
         old_child = next_old;
         new_child = new_child && new_child.nextSibling;
     }
-
-
-
-    // merge the attributes
+}
+function merge_attributes(old_node, new_node, options) {
     if (!old_node.hasAttribute) return // This is not an element (ie. a text node)
 
     /* 
