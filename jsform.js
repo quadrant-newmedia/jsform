@@ -186,12 +186,20 @@ function jsform_submit(form) {
     r.send(get_body());
 }
 
+function should_use_jsform(form) {
+    var submit_button = get_submit_button(form);
+    if (submit_button && submit_button.hasAttribute('formtarget')) {
+        return submit_button.getAttribute('formtarget') == 'jsform'
+    }
+    return form.getAttribute('target') == 'jsform'
+}
+
 /*
     Handle all user submissions of [target=jsform]
 */
 addEventListener('submit', function(e) {
     if (e.defaultPrevented) return
-    if (e.target.getAttribute('target') == 'jsform') {
+    if (should_use_jsform(e.target)) {
         e.preventDefault();
         jsform_submit(e.target);
     }
@@ -202,8 +210,16 @@ addEventListener('submit', function(e) {
 */
 var _submit = HTMLFormElement.prototype.submit;
 HTMLFormElement.prototype.submit = function() {
-    if (this.getAttribute('target') == 'jsform') jsform_submit(this)
-    else _submit.call(this)
+    // clear the "candidate submitting button"
+    // programmatic submissions should never submit any submit button
+    clicked_button = null;
+
+    if (should_use_jsform(this)) {
+        jsform_submit(this);
+    }
+    else {
+        _submit.call(this);
+    }
 }
 
 /*
