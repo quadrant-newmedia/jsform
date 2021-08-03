@@ -183,6 +183,7 @@ function jsform_submit(form) {
             }
         }
     }
+    r.setRequestHeader('X-Requested-With', 'jsform');
     r.send(get_body());
 }
 

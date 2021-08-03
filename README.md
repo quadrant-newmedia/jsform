@@ -164,6 +164,9 @@ We get the browser to do as much as possible when it comes to serializing forms.
 - overriding `target` or `method` on a submit button via `form*` attributes
 - using `form` attribute on an input element outside of the form element (not supported in IE)
 
+## X-Requested-With Header
+All of our requests set the "X-Requested-With" HTTP header to "jsform". You _may_ want to check this header when writing generic code which can handle both jsform requests and normal page requests.
+
 ## Demo/Testing
 
 This project is difficult to demo/test properly without a backend. [django_jsform](https://github.com/quadrant-newmedia/django_jsform) provides Django integration for jsform, and also serves as the official test/demo repository.
