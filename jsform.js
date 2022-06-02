@@ -74,15 +74,6 @@ function pushSelectedOptions(select, items) {
         }
     }
 }
-function has_post_body(form, submitting_button) {
-    // Does it have any files to submit?
-    for (var i = form.elements.length - 1; i >= 0; i--) {
-        var e = form.elements[i];
-        if (e.type == 'file' && !e.disabled && e.name) return true
-    }
-    // Does it have any non-file inputs to submit?
-    return to_querystring(form, submitting_button).length > 0
-}
 
 function unblock(form) {
     form.removeAttribute('block-submissions');
@@ -153,9 +144,7 @@ function jsform_submit(form) {
             That would be cleaner.
             It's hard to verify whether that would be sufficient or not - we're not sure exactly which clients/software are causing this issue.
         */
-        if (!has_post_body(form, submitting_button)) {
-            d.append('__hack_ensure_body_not_empty__', '')
-        }
+        d.append('__hack_ensure_body_not_empty__', '');
 
         return d;
     }
