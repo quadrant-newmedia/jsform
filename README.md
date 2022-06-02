@@ -4,10 +4,6 @@ A new, event driven way to handle form submissions.
 
 Somewhat inspired by [this jquery form plugin](http://jquery.malsup.com/form/).
 
-## Project Status
-
-This project is almost completely untested. We plan to develop/test it as we find uses for it. That said, if you have any questions, suggestions or comments, feel free to [create a new issue](https://github.com/quadrant-newmedia/jsform/issues/new). 
-
 ## Reason
 
 Synchronous, full-page form submissions have the following issues:
@@ -170,6 +166,10 @@ All of our requests set the "X-Requested-With" HTTP header to "jsform". You _may
 ## Demo/Testing
 
 This project is difficult to demo/test properly without a backend. [django_jsform](https://github.com/quadrant-newmedia/django_jsform) provides Django integration for jsform, and also serves as the official test/demo repository.
+
+## Feedback/Issues
+
+If you have any questions, suggestions or comments, feel free to [create a new issue](https://github.com/quadrant-newmedia/jsform/issues/new). 
 
 
 

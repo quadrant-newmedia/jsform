@@ -74,6 +74,15 @@ function pushSelectedOptions(select, items) {
         }
     }
 }
+function has_post_body(form, submitting_button) {
+    // Does it have any files to submit?
+    for (var i = form.elements.length - 1; i >= 0; i--) {
+        var e = form.elements[i];
+        if (e.type == 'file' && !e.disabled && e.name) return true
+    }
+    // Does it have any non-file inputs to submit?
+    return to_querystring(form, submitting_button).length > 0
+}
 
 function unblock(form) {
     form.removeAttribute('block-submissions');
@@ -125,6 +134,29 @@ function jsform_submit(form) {
         if (submitting_button && submitting_button.name) {
             d.append(submitting_button.name, submitting_button.value);
         }
+
+        /*
+            It's completely valid to POST an empty form.
+            However, we've run into issues with certain users when we do that.
+            Seems like they have a browser/firewall/proxy which is prematurely canceling those requests
+            (or not formatting the body correctly).
+
+            This is in no-way specific to jsform - regular form submissions likely have same issue.
+
+            As a work-around, we attach this dummy key to every non-GET submission.
+
+            It's a little opionionated to do this, but given the trouble we've had,
+            it seems like a good choice.
+
+            Note - the issue _MAY_ only arise when empty forms are submitted using mulitpart/form-data.
+            It might be sufficient to switch to application/x-www-form-urlencoded when the form is empty.
+            That would be cleaner.
+            It's hard to verify whether that would be sufficient or not - we're not sure exactly which clients/software are causing this issue.
+        */
+        if (!has_post_body(form, submitting_button)) {
+            d.append('__hack_ensure_body_not_empty__', '')
+        }
+
         return d;
     }
 
