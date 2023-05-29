@@ -63,6 +63,9 @@ This attribute is set at the very beiggning of the submission process, before an
 
 Our default `jsformsuccess` and `jsformnetworkerror` actions will unblock the form _if and only if_ the submission method is GET. Our default `jsformerror` action will always unblock the form. In this case, we're assuming your server has not processed the data, and it's safe to retry submitting (this is especially helpful during development). If you want different handling of any of these events, be sure to handle them and call `event.preventDefault()`.
 
+### Alternate Behaviour - Submission Replacing
+If you add the "replace-overlapping-requests" attribute to your form, we will _not_ add the `block-submissions` attribute. Instead, each submission will cause the previous submission request (if still pending) to abort. This is useful bevhaviour for filter forms.
+
 ## Intended Usage
 
 You _could_ manually add event listeners to each form you create, writing custom javascript to handle each response. 

@@ -80,15 +80,25 @@ function unblock(form) {
 }
 
 function jsform_submit(form) {
-    /*
-        By default, we don't allow duplicate form submissions.
+    if (form.hasAttribute('replace-overlapping-requests')) {
+        /*
+            In this mode, we do allow duplicate (even overlapping) requests, but we abort any pending requests (so their responses will be ignored).
 
-        If the end-user should be able to re-submit the same form, it's up to you to remove this attribute.
+            This is useful for filter forms.
+        */
+        if (form._most_recent_jsform_xhr) form._most_recent_jsform_xhr.abort()
+    }
+    else {
+        /*
+            By default, we don't allow duplicate form submissions.
 
-        You may remove the attribute in an event listener listening to any of our events (jsformsubmitted, jsformerror, or jsformsuccess).
-    */
-    if (form.hasAttribute('block-submissions')) return
-    form.setAttribute('block-submissions', '')
+            If the end-user should be able to re-submit the same form, it's up to you to remove this attribute.
+
+            You may remove the attribute in an event listener listening to any of our events (jsformsubmitted, jsformerror, or jsformsuccess).
+        */
+        if (form.hasAttribute('block-submissions')) return
+        form.setAttribute('block-submissions', '')
+    }
 
     /*
         Form elements (inputs) can mask standard form properties,
@@ -159,6 +169,7 @@ function jsform_submit(form) {
     form_clone.dispatchEvent.call(form, (new CustomEvent('jsformsubmitted', {bubbles: true, detail: jsform_data})));
 
     var r = new XMLHttpRequest();
+    form._most_recent_jsform_xhr = r;
     r.open(method, get_url());
     r.onerror = function(event) {
         var e = new CustomEvent('jsformnetworkerror', {bubbles: true, cancelable: true});
