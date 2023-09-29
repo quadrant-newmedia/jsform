@@ -80,6 +80,7 @@ function merge_from(url, options) {
     var r = new XMLHttpRequest();
     r.addEventListener('load', function(event) {
         if (r.status < 200 || r.status > 299) {
+            document.dispatchEvent(createEvent('elementmergeerrorresponse', false, false, r));
             return
         }
         merge_documents(document, r.response, options);
